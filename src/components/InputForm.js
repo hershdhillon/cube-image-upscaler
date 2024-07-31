@@ -1,7 +1,23 @@
+import { useState } from 'react';
+
 export default function InputForm({ formData, setFormData, onSubmit, isLoading }) {
+    const [imagePreview, setImagePreview] = useState(null);
+
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const { name, value, type, files } = e.target;
+        if (name === 'image' && type === 'file') {
+            const file = files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setFormData({ ...formData, [name]: reader.result });
+                    setImagePreview(reader.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
     };
 
     const handleSubmit = (e) => {
@@ -46,6 +62,35 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
                                     </option>
                                 ))}
                             </select>
+                        ) : key === 'image' ? (
+                            <div>
+                                <input
+                                    type="file"
+                                    id={`${key}_file`}
+                                    name={key}
+                                    onChange={handleInputChange}
+                                    accept="image/*"
+                                    className="hidden"
+                                />
+                                <input
+                                    type="text"
+                                    id={key}
+                                    name={key}
+                                    value={value}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter image URL or upload a file"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                />
+                                <label
+                                    htmlFor={`${key}_file`}
+                                    className="mt-2 inline-block px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
+                                >
+                                    Upload Image
+                                </label>
+                                {imagePreview && (
+                                    <img src={imagePreview} alt="Preview" className="mt-2 max-w-full h-auto" />
+                                )}
+                            </div>
                         ) : (
                             <input
                                 type={typeof value === 'number' ? 'number' : 'text'}
