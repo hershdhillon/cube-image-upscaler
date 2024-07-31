@@ -34,9 +34,9 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
     const getInfoLabel = (key) => {
         const infoLabels = {
             scale_factor: "Default: 2",
-            dynamic: "Default: 6 (3-9)",
-            creativity: "Default: 0.35 (0.3-0.9)",
-            resemblance: "Default: 0.6 (0.3-1.6)",
+            dynamic: "Default: 6 • Range: 3-9",
+            creativity: "Default: 0.35 • Range: 0.3-0.9",
+            resemblance: "Default: 0.6 • Range: 0.3-1.6",
             num_inference_steps: "Default: 18",
         };
         return infoLabels[key] || "";
