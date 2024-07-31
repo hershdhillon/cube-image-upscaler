@@ -10,17 +10,18 @@ export default function ImagePreview({ result, formData, onFullscreen, isFullscr
     }
 
     return (
-        <div className={`relative group ${isFullscreen ? 'h-full w-full' : ''}`}>
+        <div className={`relative group ${isFullscreen ? 'fixed inset-0 z-50 bg-black' : ''}`}>
             <button
                 onClick={onFullscreen}
                 className="absolute top-4 left-4 z-10 bg-white text-gray-800 px-3 py-1 rounded-md shadow-md text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity"
             >
                 {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
             </button>
-            <div className={isFullscreen ? 'h-full w-full flex items-center justify-center' : ''}>
+            <div className={`${isFullscreen ? 'h-full w-full flex items-center justify-center' : ''}`}>
                 <ImageComparisonSlider
                     originalImage={formData.image}
                     processedImage={result.output[0]}
+                    isFullscreen={isFullscreen}
                 />
             </div>
         </div>
