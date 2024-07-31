@@ -1,6 +1,6 @@
 export const metadata = {
-  title: 'Clarity Upscaler',
-  description: 'Upscale your images with Clarity Upscaler',
+  title: 'Local Image Upscaler',
+  description: 'Upscale your images locally',
 }
 
 export default function RootLayout({ children }) {
