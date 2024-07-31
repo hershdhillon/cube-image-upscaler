@@ -5,6 +5,20 @@ import JsonView from './JsonView';
 export default function OutputDisplay({ result, formData }) {
     const [activeTab, setActiveTab] = useState('preview');
 
+    const handleDownload = () => {
+        if (result && result.output && result.output[0]) {
+            // Create a temporary anchor element
+            const link = document.createElement('a');
+            link.href = result.output[0];
+            link.download = 'upscaled_image.png'; // You can customize the filename here
+
+            // Append to the document, trigger click, and remove
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
     return (
         <div className="lg:w-2/3 p-6 lg:p-8">
             <div className="flex flex-col flex-1 space-y-4">
@@ -45,17 +59,12 @@ export default function OutputDisplay({ result, formData }) {
                             </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                            <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                Tweak it
-                            </button>
-                            <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                Share
-                            </button>
-                            <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            <button
+                                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                onClick={handleDownload}
+                                disabled={!result || !result.output || !result.output[0]}
+                            >
                                 Download
-                            </button>
-                            <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                Report
                             </button>
                         </div>
                     </>
