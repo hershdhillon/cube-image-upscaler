@@ -1,9 +1,20 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ImagePreview from './ImagePreview';
 import JsonView from './JsonView';
 
 export default function OutputDisplay({ result, formData, isLoading, onUpscale }) {
     const [activeTab, setActiveTab] = useState('preview');
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const fullscreenRef = useRef(null);
+
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    }, []);
 
     const generateUniqueFileName = () => {
         const timestamp = new Date().getTime();
@@ -24,8 +35,32 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
         }
     };
 
+    const toggleFullscreen = () => {
+        if (!isFullscreen) {
+            if (fullscreenRef.current.requestFullscreen) {
+                fullscreenRef.current.requestFullscreen();
+            } else if (fullscreenRef.current.mozRequestFullScreen) {
+                fullscreenRef.current.mozRequestFullScreen();
+            } else if (fullscreenRef.current.webkitRequestFullscreen) {
+                fullscreenRef.current.webkitRequestFullscreen();
+            } else if (fullscreenRef.current.msRequestFullscreen) {
+                fullscreenRef.current.msRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+    };
+
     return (
-        <div className="lg:w-2/3 p-6 lg:p-8">
+        <div className={`lg:w-2/3 p-6 lg:p-8 ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
             <div className="flex flex-col flex-1 space-y-4">
                 <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold">Output</h2>
@@ -55,19 +90,19 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
                         JSON
                     </button>
                 </div>
-                <div className="bg-gray-100 p-4 relative">
+                <div className={`bg-gray-100 p-4 relative ${isFullscreen ? 'h-screen flex items-center justify-center' : ''}`} ref={fullscreenRef}>
                     {isLoading && (
                         <div className="absolute top-2 right-2 z-10 bg-white bg-opacity-75 p-1">
                             <div className="loader"></div>
                         </div>
                     )}
                     {activeTab === 'preview' ? (
-                        <ImagePreview result={result} formData={formData} />
+                        <ImagePreview result={result} formData={formData} onFullscreen={toggleFullscreen} isFullscreen={isFullscreen} />
                     ) : (
                         <JsonView result={result} />
                     )}
                 </div>
-                {result && (
+                {result && !isFullscreen && (
                     <>
                         <div className="flex flex-col md:flex-row md:flex-wrap gap-6 text-gray-700">
                             <div className="flex flex-col space-y-1">
