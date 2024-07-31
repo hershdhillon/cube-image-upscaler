@@ -2,7 +2,7 @@ import { useState } from 'react';
 import ImagePreview from './ImagePreview';
 import JsonView from './JsonView';
 
-export default function OutputDisplay({ result, formData, isLoading }) {
+export default function OutputDisplay({ result, formData, isLoading, onUpscale }) {
     const [activeTab, setActiveTab] = useState('preview');
 
     const generateUniqueFileName = () => {
@@ -27,8 +27,15 @@ export default function OutputDisplay({ result, formData, isLoading }) {
     return (
         <div className="lg:w-2/3 p-6 lg:p-8">
             <div className="flex flex-col flex-1 space-y-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold">Output</h2>
+                    <button
+                        onClick={onUpscale}
+                        disabled={isLoading}
+                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                    >
+                        {isLoading ? 'Processing...' : 'Upscale Image'}
+                    </button>
                 </div>
                 <div role="tablist" className="flex border-b">
                     <button
@@ -48,7 +55,7 @@ export default function OutputDisplay({ result, formData, isLoading }) {
                         JSON
                     </button>
                 </div>
-                <div className="bg-gray-100  p-4 relative">
+                <div className="bg-gray-100 p-4 relative">
                     {isLoading && (
                         <div className="absolute top-2 right-2 z-10 bg-white bg-opacity-75 p-1">
                             <div className="loader"></div>
