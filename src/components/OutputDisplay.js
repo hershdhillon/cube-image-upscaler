@@ -5,12 +5,22 @@ import JsonView from './JsonView';
 export default function OutputDisplay({ result, formData }) {
     const [activeTab, setActiveTab] = useState('preview');
 
+    const generateUniqueFileName = () => {
+        // Generate a unique hash using the current timestamp and a random number
+        const timestamp = new Date().getTime();
+        const randomNum = Math.floor(Math.random() * 10000);
+        const hash = (timestamp + randomNum).toString(36); // Convert to base36 for shorter string
+        return `upscaled_${hash}.png`;
+    };
+
     const handleDownload = () => {
         if (result && result.output && result.output[0]) {
+            const uniqueFileName = generateUniqueFileName();
+
             // Create a temporary anchor element
             const link = document.createElement('a');
             link.href = result.output[0];
-            link.download = 'upscaled_image.png'; // You can customize the filename here
+            link.download = uniqueFileName;
 
             // Append to the document, trigger click, and remove
             document.body.appendChild(link);
