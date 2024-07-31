@@ -7,7 +7,7 @@ export default function UpscalerForm() {
     const [formData, setFormData] = useState({
         seed: 1337,
         image: '',
-        prompt: '',
+        prompt: 'masterpiece, best quality, highres',
         dynamic: 6,
         sd_model: 'juggernaut_reborn.safetensors [338b85bc4f]',
         creativity: 0.35,
@@ -51,7 +51,6 @@ export default function UpscalerForm() {
                     <div className="flex flex-col lg:flex-row">
                         {/* Form Section */}
                         <div className="lg:w-1/3 p-6 lg:p-8 bg-gray-50">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Image Upscaler</h2>
                             <form id="upscaler-form" onSubmit={handleSubmit} className="space-y-4">
                                 {Object.entries(formData).map(([key, value]) => (
                                     <div key={key}>
@@ -94,13 +93,14 @@ export default function UpscalerForm() {
 
                         {/* Output Section */}
                         <div className="lg:w-2/3 p-6 lg:p-8">
-                            <h3 className="text-xl font-semibold mb-4">Output:</h3>
+                            <h3 className="text-xl font-semibold mb-4">Output</h3>
+                            <hr className="mb-4" />
                             {result ? (
                                 result.error ? (
                                     <p className="text-red-600">{result.error}</p>
                                 ) : (
                                     <div className="space-y-4">
-                                        <div className="w-full h-[60vh] bg-gray-200 rounded-lg overflow-hidden">
+                                        <div className="w-full h-full bg-gray-200 rounded-lg overflow-hidden">
                                             <ImageComparisonSlider
                                                 originalImage={formData.image}
                                                 processedImage={result.output}
