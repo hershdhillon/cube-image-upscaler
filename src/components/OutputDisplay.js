@@ -5,7 +5,6 @@ import JsonView from './JsonView';
 export default function OutputDisplay({ result, formData, isLoading }) {
     const [activeTab, setActiveTab] = useState('preview');
 
-
     const generateUniqueFileName = () => {
         const timestamp = new Date().getTime();
         const randomNum = Math.floor(Math.random() * 10000);
@@ -26,12 +25,7 @@ export default function OutputDisplay({ result, formData, isLoading }) {
     };
 
     return (
-        <div className="lg:w-2/3 p-6 lg:p-8 relative">
-            {isLoading && (
-                <div className="absolute top-4 right-4 z-10">
-                    <div className="loader"></div>
-                </div>
-            )}
+        <div className="lg:w-2/3 p-6 lg:p-8">
             <div className="flex flex-col flex-1 space-y-4">
                 <div className="flex items-center gap-2">
                     <h2 className="text-2xl font-bold">Output</h2>
@@ -54,7 +48,12 @@ export default function OutputDisplay({ result, formData, isLoading }) {
                         JSON
                     </button>
                 </div>
-                <div className="bg-gray-100 rounded-lg p-4">
+                <div className="bg-gray-100  p-4 relative">
+                    {isLoading && (
+                        <div className="absolute top-2 right-2 z-10  p-1">
+                            <div className="loader"></div>
+                        </div>
+                    )}
                     {activeTab === 'preview' ? (
                         <ImagePreview result={result} formData={formData} />
                     ) : (

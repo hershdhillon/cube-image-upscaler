@@ -14,7 +14,7 @@ export default function UpscalerForm() {
         creativity: 0.35,
         resemblance: 0.6,
         scale_factor: 2,
-        negative_prompt: '(worst quality, low quality, normal quality:2) JuggernautNegative-neg',
+        negative_prompt: '(worst quality, low quality, normal quality:2)',
         num_inference_steps: 18,
     });
     const [result, setResult] = useState(null);
@@ -41,7 +41,7 @@ export default function UpscalerForm() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
+        <div className="min-h-screen bg-blue-50 p-4 sm:p-6 lg:p-8">
             <div className="max-w-full mx-auto">
                 <div className="bg-white shadow-xl rounded-lg overflow-hidden">
                     <div className="flex flex-col lg:flex-row">
