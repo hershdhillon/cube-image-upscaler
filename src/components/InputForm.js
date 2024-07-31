@@ -9,6 +9,12 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
         onSubmit(formData);
     };
 
+    const sdModelOptions = [
+        { value: "juggernaut_reborn.safetensors [338b85bc4f]", label: "juggernaut_reborn" },
+        { value: "epicrealism_naturalSinRC1VAE.safetensors [84d76a0328]", label: "epicrealism_naturalSinRC1VAE" },
+        { value: "flat2DAnimerge_v45Sharp.safetensors", label: "flat2DAnimerge_v45Sharp" },
+    ];
+
     return (
         <div className="lg:w-1/3 p-6 lg:p-8 bg-gray-50">
             <form id="upscaler-form" onSubmit={handleSubmit} className="space-y-4">
@@ -26,6 +32,20 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
                                 rows="3"
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                             />
+                        ) : key === 'sd_model' ? (
+                            <select
+                                id={key}
+                                name={key}
+                                value={value}
+                                onChange={handleInputChange}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            >
+                                {sdModelOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
                         ) : (
                             <input
                                 type={typeof value === 'number' ? 'number' : 'text'}
