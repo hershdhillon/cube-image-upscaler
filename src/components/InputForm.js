@@ -3,7 +3,6 @@ import { useState } from 'react';
 export default function InputForm({ formData, setFormData, onSubmit, isLoading }) {
     const [imagePreview, setImagePreview] = useState(null);
 
-
     const handleInputChange = (e) => {
         const { name, value, type, files } = e.target;
         if (name === 'image' && type === 'file') {
@@ -32,13 +31,26 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
         { value: "flat2DAnimerge_v45Sharp.safetensors", label: "flat2DAnimerge_v45Sharp" },
     ];
 
+    const getInfoLabel = (key) => {
+        const infoLabels = {
+            scale_factor: "Default: 2",
+            dynamic: "Default: 6 (3-9)",
+            creativity: "Default: 0.35 (0.3-0.9)",
+            resemblance: "Default: 0.6 (0.3-1.6)",
+            num_inference_steps: "Default: 18",
+        };
+        return infoLabels[key] || "";
+    };
+
     return (
         <div className="lg:w-1/3 p-6 lg:p-8 bg-gray-50">
             <form id="upscaler-form" onSubmit={handleSubmit} className="space-y-4">
                 {Object.entries(formData).map(([key, value]) => (
                     <div key={key}>
                         <label htmlFor={key} className="block text-sm font-medium text-gray-700 mb-1">
-                            {key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ')}
+                            {key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                            {getInfoLabel(key) &&
+                                <span className="text-xs text-gray-500 ml-1">{getInfoLabel(key)}</span>}
                         </label>
                         {key === 'negative_prompt' ? (
                             <textarea

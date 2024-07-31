@@ -92,7 +92,7 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
                 </div>
                 <div className={`bg-gray-100 p-4 relative ${isFullscreen ? 'h-screen flex items-center justify-center' : ''}`} ref={fullscreenRef}>
                     {isLoading && (
-                        <div className="absolute top-2 right-2 z-10 bg-white bg-opacity-75 p-1">
+                        <div className="absolute top-2 right-2 z-10 bg-white p-1">
                             <div className="loader"></div>
                         </div>
                     )}

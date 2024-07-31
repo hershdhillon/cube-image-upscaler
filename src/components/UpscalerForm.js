@@ -6,7 +6,6 @@ import OutputDisplay from './OutputDisplay';
 
 export default function UpscalerForm() {
     const [formData, setFormData] = useState({
-        seed: 1337,
         image: '',
         prompt: 'masterpiece, best quality, highres',
         dynamic: 6,
@@ -15,7 +14,8 @@ export default function UpscalerForm() {
         resemblance: 0.6,
         scale_factor: 2,
         negative_prompt: '(worst quality, low quality, normal quality:2)',
-        num_inference_steps: 18,
+        num_inference_steps: 20,
+        seed: 1337,
     });
     const [result, setResult] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
