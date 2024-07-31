@@ -3,6 +3,7 @@ import { useState } from 'react';
 export default function InputForm({ formData, setFormData, onSubmit, isLoading }) {
     const [imagePreview, setImagePreview] = useState(null);
 
+
     const handleInputChange = (e) => {
         const { name, value, type, files } = e.target;
         if (name === 'image' && type === 'file') {

@@ -20,6 +20,7 @@ export default function UpscalerForm() {
     const [result, setResult] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
+
     const handleSubmit = async (newFormData) => {
         setIsLoading(true);
         try {
@@ -50,7 +51,7 @@ export default function UpscalerForm() {
                             onSubmit={handleSubmit}
                             isLoading={isLoading}
                         />
-                        <OutputDisplay result={result} formData={formData} />
+                        <OutputDisplay result={result} formData={formData} isLoading={isLoading} />
                     </div>
                 </div>
             </div>

@@ -2,27 +2,23 @@ import { useState } from 'react';
 import ImagePreview from './ImagePreview';
 import JsonView from './JsonView';
 
-export default function OutputDisplay({ result, formData }) {
+export default function OutputDisplay({ result, formData, isLoading }) {
     const [activeTab, setActiveTab] = useState('preview');
 
+
     const generateUniqueFileName = () => {
-        // Generate a unique hash using the current timestamp and a random number
         const timestamp = new Date().getTime();
         const randomNum = Math.floor(Math.random() * 10000);
-        const hash = (timestamp + randomNum).toString(36); // Convert to base36 for shorter string
+        const hash = (timestamp + randomNum).toString(36);
         return `upscaled_${hash}.png`;
     };
 
     const handleDownload = () => {
         if (result && result.output && result.output[0]) {
             const uniqueFileName = generateUniqueFileName();
-
-            // Create a temporary anchor element
             const link = document.createElement('a');
             link.href = result.output[0];
             link.download = uniqueFileName;
-
-            // Append to the document, trigger click, and remove
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -30,7 +26,12 @@ export default function OutputDisplay({ result, formData }) {
     };
 
     return (
-        <div className="lg:w-2/3 p-6 lg:p-8">
+        <div className="lg:w-2/3 p-6 lg:p-8 relative">
+            {isLoading && (
+                <div className="absolute top-4 right-4 z-10">
+                    <div className="loader"></div>
+                </div>
+            )}
             <div className="flex flex-col flex-1 space-y-4">
                 <div className="flex items-center gap-2">
                     <h2 className="text-2xl font-bold">Output</h2>
