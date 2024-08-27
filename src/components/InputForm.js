@@ -4,20 +4,32 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
     const [imagePreview, setImagePreview] = useState(null);
 
     const handleInputChange = (e) => {
-        const { name, value, type, files } = e.target;
-        if (name === 'image' && type === 'file') {
-            const file = files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setFormData({ ...formData, [name]: reader.result });
-                    setImagePreview(reader.result);
-                };
-                reader.readAsDataURL(file);
+        const { name, value, type } = e.target;
+        if (type === 'number') {
+            const numValue = parseFloat(value);
+            if (!isNaN(numValue)) {
+                setFormData({ ...formData, [name]: Number(numValue.toFixed(2)) });
             }
         } else {
             setFormData({ ...formData, [name]: value });
         }
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData({ ...formData, image: reader.result });
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleRandomSeed = () => {
+        const randomSeed = Math.floor(Math.random() * 1000000);
+        setFormData({ ...formData, seed: randomSeed });
     };
 
     const handleSubmit = (e) => {
@@ -37,9 +49,21 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
             dynamic: "Default: 6 • Range: 3-9",
             creativity: "Default: 0.35 • Range: 0.3-0.9",
             resemblance: "Default: 0.6 • Range: 0.3-1.6",
-            num_inference_steps: "Default: 18",
+            num_inference_steps: "Default: 20",
         };
         return infoLabels[key] || "";
+    };
+
+    const getStepSize = (key) => {
+        const stepSizes = {
+            dynamic: 1,
+            creativity: 0.05,
+            resemblance: 0.1,
+            scale_factor: 0.5,
+            num_inference_steps: 1,
+            seed: 1,
+        };
+        return stepSizes[key] || 0.1;
     };
 
     return (
@@ -81,7 +105,7 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
                                     type="file"
                                     id={`${key}_file`}
                                     name={key}
-                                    onChange={handleInputChange}
+                                    onChange={handleFileChange}
                                     accept="image/*"
                                     className="hidden"
                                 />
@@ -104,6 +128,25 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
                                     <img src={imagePreview} alt="Preview" className="mt-2 max-w-full h-auto" />
                                 )}
                             </div>
+                        ) : key === 'seed' ? (
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="number"
+                                    id={key}
+                                    name={key}
+                                    value={value}
+                                    onChange={handleInputChange}
+                                    step={getStepSize(key)}
+                                    className="flex-grow px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleRandomSeed}
+                                    className="px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                >
+                                    Random
+                                </button>
+                            </div>
                         ) : (
                             <input
                                 type={typeof value === 'number' ? 'number' : 'text'}
@@ -111,7 +154,7 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
                                 name={key}
                                 value={value}
                                 onChange={handleInputChange}
-                                step={typeof value === 'number' && key !== 'seed' ? '0.01' : '1'}
+                                step={getStepSize(key)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                             />
                         )}
