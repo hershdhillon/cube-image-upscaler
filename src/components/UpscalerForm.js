@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import InputForm from './InputForm';
 import OutputDisplay from './OutputDisplay';
 
 export default function UpscalerForm() {
     const [formData, setFormData] = useState({
         image: '',
-        prompt: 'masterpiece, best quality, highres',
+        prompt: "masterpiece, best quality, highres, <lora:more_details:0.5> <lora:SDXLrender_v2.0:1>",
         dynamic: 6,
         sd_model: 'juggernaut_reborn.safetensors [338b85bc4f]',
         creativity: 0.35,
@@ -19,6 +19,11 @@ export default function UpscalerForm() {
     });
     const [result, setResult] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        // Clear the result when a new image is uploaded
+        setResult(null);
+    }, [formData.image]);
 
     const handleUpscale = () => {
         handleSubmit(formData);
@@ -45,7 +50,7 @@ export default function UpscalerForm() {
     };
 
     return (
-        <div className="min-h-screen bg-blue-50 p-4 sm:p-6 lg:p-8">
+        <div className="min-h-screen p-2 sm:p-4 lg:p-6">
             <div className="max-w-full mx-auto">
                 <div className="bg-white shadow-xl rounded-lg overflow-hidden">
                     <div className="flex flex-col lg:flex-row">

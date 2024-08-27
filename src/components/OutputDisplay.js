@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import ImagePreview from './ImagePreview';
+import ImageComparisonSlider from './ImageComparisonSlider';
 import JsonView from './JsonView';
 
 export default function OutputDisplay({ result, formData, isLoading, onUpscale }) {
@@ -97,7 +97,17 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
                         </div>
                     )}
                     {activeTab === 'preview' ? (
-                        <ImagePreview result={result} formData={formData} onFullscreen={toggleFullscreen} isFullscreen={isFullscreen} />
+                        result && result.output && result.output[0] ? (
+                            <ImageComparisonSlider
+                                originalImage={formData.image}
+                                processedImage={result.output[0]}
+                                isFullscreen={isFullscreen}
+                            />
+                        ) : (
+                            <div className="text-center py-8">
+                                {formData.image ? "Upload an image and click 'Upscale Image' to see the result." : "No image uploaded yet."}
+                            </div>
+                        )
                     ) : (
                         <JsonView result={result} />
                     )}

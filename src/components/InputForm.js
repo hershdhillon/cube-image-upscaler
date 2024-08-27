@@ -1,7 +1,12 @@
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 
 export default function InputForm({ formData, setFormData, onSubmit, isLoading }) {
     const [imagePreview, setImagePreview] = useState(null);
+
+    useEffect(() => {
+        // Clear the image preview when formData.image changes
+        setImagePreview(formData.image);
+    }, [formData.image]);
 
     const handleInputChange = (e) => {
         const { name, value, type } = e.target;
@@ -21,7 +26,6 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
             const reader = new FileReader();
             reader.onloadend = () => {
                 setFormData({ ...formData, image: reader.result });
-                setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
         }
