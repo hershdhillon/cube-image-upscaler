@@ -4,7 +4,6 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
     const [imagePreview, setImagePreview] = useState(null);
 
     useEffect(() => {
-        // Clear the image preview when formData.image changes
         setImagePreview(formData.image);
     }, [formData.image]);
 
@@ -80,14 +79,15 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
                             {getInfoLabel(key) &&
                                 <span className="text-xs text-gray-500 ml-1">{getInfoLabel(key)}</span>}
                         </label>
-                        {key === 'negative_prompt' ? (
+                        {key === 'prompt' || key === 'negative_prompt' ? (
                             <textarea
                                 id={key}
                                 name={key}
                                 value={value}
                                 onChange={handleInputChange}
-                                rows="3"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                rows="4"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 resize-y"
+                                style={{ minHeight: '100px' }}
                             />
                         ) : key === 'sd_model' ? (
                             <select
