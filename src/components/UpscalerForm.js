@@ -86,7 +86,7 @@ export default function UpscalerForm() {
     };
 
     return (
-        <div className="min-h-screen p-2 sm:p-4 lg:p-6">
+        <div className="min-h-screen sm:p-2 lg:p-4">
             <div className="max-w-full mx-auto">
                 <div className="bg-white shadow-xl rounded-lg overflow-hidden">
                     <div className="flex flex-col lg:flex-row">
