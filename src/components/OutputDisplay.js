@@ -85,7 +85,7 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
         } else if (formData.image && !result) {
             return (
                 <div className="w-full h-64 bg-gray-200 flex items-center justify-center text-gray-500">
-                    Image uploaded, now click 'Upscale Image' to see the result.
+                    Image uploaded, now click &apos;Upscale Image&apos; to see the result.
                 </div>
             );
         } else if (result && result.output && result.output[0]) {
