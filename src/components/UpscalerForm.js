@@ -21,14 +21,12 @@ export default function UpscalerForm() {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        // Clear the result when a new image is uploaded
         setResult(null);
     }, [formData.image]);
 
     const handleUpscale = () => {
         handleSubmit(formData);
     };
-
 
     const handleSubmit = async (newFormData) => {
         setIsLoading(true);
@@ -41,12 +39,50 @@ export default function UpscalerForm() {
                 body: JSON.stringify(newFormData),
             });
             const data = await response.json();
-            setResult(data);
+            if (response.ok) {
+                if (data.id) {
+                    // If the response includes an ID, it's an asynchronous process
+                    await pollPrediction(data.id);
+                } else {
+                    // If there's no ID, assume the result is directly in the response
+                    setResult(data);
+                    setIsLoading(false);
+                }
+            } else {
+                throw new Error(data.error || 'Failed to start upscaling process');
+            }
         } catch (error) {
             console.error('Error:', error);
-            setResult({error: 'An error occurred while processing the image'});
+            setResult({error: error.message || 'An error occurred while processing the image'});
+            setIsLoading(false);
         }
-        setIsLoading(false);
+    };
+
+    const pollPrediction = async (predictionId) => {
+        const pollInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`/api/upscale?id=${predictionId}`);
+                const prediction = await response.json();
+                if (response.status === 200) {
+                    if (prediction.status === 'succeeded') {
+                        clearInterval(pollInterval);
+                        setResult(prediction);
+                        setIsLoading(false);
+                    } else if (prediction.status === 'failed') {
+                        clearInterval(pollInterval);
+                        throw new Error('Upscaling process failed');
+                    }
+                    // If it's still processing, continue polling
+                } else {
+                    throw new Error('Failed to fetch upscaling status');
+                }
+            } catch (error) {
+                clearInterval(pollInterval);
+                console.error('Polling error:', error);
+                setResult({error: error.message || 'An error occurred while fetching the upscaling result'});
+                setIsLoading(false);
+            }
+        }, 1000); // Poll every second
     };
 
     return (
