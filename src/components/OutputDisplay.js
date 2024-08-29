@@ -59,6 +59,35 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
         }
     };
 
+    const renderPreview = () => {
+        if (!formData.image) {
+            // Show default comparison when no image is uploaded
+            return (
+                <ImageComparisonSlider
+                    originalImage={null}
+                    processedImage={null}
+                    isFullscreen={isFullscreen}
+                />
+            );
+        } else if (formData.image && !result) {
+            // Show placeholder when image is uploaded but not processed
+            return (
+                <div className="w-full h-64 bg-gray-200 flex items-center justify-center text-gray-500">
+                    Image uploaded, now click 'Upscale Image' to see the result.
+                </div>
+            );
+        } else if (result && result.output && result.output[0]) {
+            // Show comparison when image is processed
+            return (
+                <ImageComparisonSlider
+                    originalImage={formData.image}
+                    processedImage={result.output[0]}
+                    isFullscreen={isFullscreen}
+                />
+            );
+        }
+    };
+
     return (
         <div className={`lg:w-2/3 p-6 lg:p-8 ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
             <div className="flex flex-col flex-1 space-y-4">
@@ -66,7 +95,7 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
                     <h2 className="text-2xl font-bold">Output</h2>
                     <button
                         onClick={onUpscale}
-                        disabled={isLoading}
+                        disabled={isLoading || !formData.image}
                         className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                     >
                         {isLoading ? 'Processing...' : 'Upscale Image'}
@@ -96,15 +125,7 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
                             <div className="loader"></div>
                         </div>
                     )}
-                    {activeTab === 'preview' ? (
-                        <ImageComparisonSlider
-                            originalImage={result ? formData.image : null}
-                            processedImage={result && result.output ? result.output[0] : null}
-                            isFullscreen={isFullscreen}
-                        />
-                    ) : (
-                        <JsonView result={result} />
-                    )}
+                    {activeTab === 'preview' ? renderPreview() : <JsonView result={result} />}
                 </div>
                 {result && !isFullscreen && (
                     <>
