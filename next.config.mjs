@@ -12,6 +12,8 @@ const nextConfig = {
                 hostname: "replicate.delivery",
             },
         ],
+        domains: ['localhost', 'replicate.com', 'replicate.delivery'],
+        unoptimized: true,
     },
     env: {
         REPLICATE_API_TOKEN: process.env.REPLICATE_API_TOKEN,

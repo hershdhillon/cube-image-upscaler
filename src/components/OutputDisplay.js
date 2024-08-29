@@ -97,17 +97,11 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
                         </div>
                     )}
                     {activeTab === 'preview' ? (
-                        result && result.output && result.output[0] ? (
-                            <ImageComparisonSlider
-                                originalImage={formData.image}
-                                processedImage={result.output[0]}
-                                isFullscreen={isFullscreen}
-                            />
-                        ) : (
-                            <div className="text-center py-8">
-                                {formData.image ? "Upload an image and click 'Upscale Image' to see the result." : "No image uploaded yet."}
-                            </div>
-                        )
+                        <ImageComparisonSlider
+                            originalImage={result ? formData.image : null}
+                            processedImage={result && result.output ? result.output[0] : null}
+                            isFullscreen={isFullscreen}
+                        />
                     ) : (
                         <JsonView result={result} />
                     )}
