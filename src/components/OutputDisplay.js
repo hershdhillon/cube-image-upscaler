@@ -35,6 +35,12 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
         }
     };
 
+    const handleViewFullImage = () => {
+        if (result && result.output && result.output[0]) {
+            window.open(result.output[0], '_blank');
+        }
+    };
+
     const toggleFullscreen = () => {
         if (!isFullscreen) {
             if (fullscreenRef.current.requestFullscreen) {
@@ -61,7 +67,6 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
 
     const renderPreview = () => {
         if (!formData.image) {
-            // Show default comparison when no image is uploaded
             return (
                 <ImageComparisonSlider
                     originalImage={null}
@@ -70,14 +75,12 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
                 />
             );
         } else if (formData.image && !result) {
-            // Show placeholder when image is uploaded but not processed
             return (
                 <div className="w-full h-64 bg-gray-200 flex items-center justify-center text-gray-500">
                     Image uploaded, now click 'Upscale Image' to see the result.
                 </div>
             );
         } else if (result && result.output && result.output[0]) {
-            // Show comparison when image is processed
             return (
                 <ImageComparisonSlider
                     originalImage={formData.image}
@@ -136,6 +139,13 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
                             </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
+                            <button
+                                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                onClick={handleViewFullImage}
+                                disabled={!result || !result.output || !result.output[0]}
+                            >
+                                View Full Image
+                            </button>
                             <button
                                 className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
                                 onClick={handleDownload}
