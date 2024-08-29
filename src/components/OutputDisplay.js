@@ -23,15 +23,23 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
         return `upscaled_${hash}.png`;
     };
 
-    const handleDownload = () => {
+    const handleDownload = async () => {
         if (result && result.output && result.output[0]) {
-            const uniqueFileName = generateUniqueFileName();
-            const link = document.createElement('a');
-            link.href = result.output[0];
-            link.download = uniqueFileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            try {
+                const response = await fetch(result.output[0]);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = generateUniqueFileName();
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error downloading the image:', error);
+                alert('Failed to download the image. Please try again.');
+            }
         }
     };
 
