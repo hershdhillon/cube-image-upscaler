@@ -12,22 +12,42 @@ if not exist "%DOCKER_PATH%" (
 )
 
 REM Check if Docker is already running
+:check_docker
 docker info >nul 2>&1
 if %errorlevel% equ 0 (
     echo Docker is already running.
+    goto :docker_ready
 ) else (
-    echo Starting Docker Desktop...
+    echo Docker is not running. Attempting to start Docker Desktop...
     start "" "%DOCKER_PATH%"
-
-    :wait_for_docker
-    timeout /t 2 /nobreak >nul
-    docker info >nul 2>&1
-    if %errorlevel% neq 0 (
-        echo Waiting for Docker to start...
-        goto :wait_for_docker
-    )
-    echo Docker is now running.
 )
+
+REM Wait for Docker to start
+set /a attempts=0
+:wait_for_docker
+timeout /t 5 /nobreak >nul
+set /a attempts+=1
+echo Attempt %attempts%: Checking if Docker is running...
+docker info >nul 2>&1
+if %errorlevel% equ 0 (
+    echo Docker is now running.
+    goto :docker_ready
+) else (
+    if %attempts% lss 12 (
+        echo Docker is still starting. Waiting...
+        goto :wait_for_docker
+    ) else (
+        echo Docker failed to start after 1 minute. Please check Docker Desktop manually.
+        goto :end
+    )
+)
+
+:docker_ready
+REM Rest of your script continues here...
+
+:end
+echo Script execution completed.
+pause
 
 REM Check if the container already exists
 docker ps -a --filter "name=clarity-upscaler" --format "{{.Names}}" | findstr /i "clarity-upscaler" >nul
