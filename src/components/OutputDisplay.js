@@ -23,15 +23,29 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
         return `upscaled_${hash}.png`;
     };
 
-    const handleDownload = () => {
+    const handleDownload = async () => {
         if (result && result.output && result.output[0]) {
-            const uniqueFileName = generateUniqueFileName();
-            const link = document.createElement('a');
-            link.href = result.output[0];
-            link.download = uniqueFileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            try {
+                const response = await fetch(result.output[0]);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = generateUniqueFileName();
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error downloading the image:', error);
+                alert('Failed to download the image. Please try again.');
+            }
+        }
+    };
+
+    const handleViewFullImage = () => {
+        if (result && result.output && result.output[0]) {
+            window.open(result.output[0], '_blank');
         }
     };
 
@@ -59,6 +73,32 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
         }
     };
 
+    const renderPreview = () => {
+        if (!formData.image) {
+            return (
+                <ImageComparisonSlider
+                    originalImage={null}
+                    processedImage={null}
+                    isFullscreen={isFullscreen}
+                />
+            );
+        } else if (formData.image && !result) {
+            return (
+                <div className="w-full h-64 bg-gray-200 flex items-center justify-center text-gray-500">
+                    Image uploaded, now click &apos;Upscale Image&apos; to see the result.
+                </div>
+            );
+        } else if (result && result.output && result.output[0]) {
+            return (
+                <ImageComparisonSlider
+                    originalImage={formData.image}
+                    processedImage={result.output[0]}
+                    isFullscreen={isFullscreen}
+                />
+            );
+        }
+    };
+
     return (
         <div className={`lg:w-2/3 p-6 lg:p-8 ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
             <div className="flex flex-col flex-1 space-y-4">
@@ -66,7 +106,7 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
                     <h2 className="text-2xl font-bold">Output</h2>
                     <button
                         onClick={onUpscale}
-                        disabled={isLoading}
+                        disabled={isLoading || !formData.image}
                         className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                     >
                         {isLoading ? 'Processing...' : 'Upscale Image'}
@@ -96,21 +136,7 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
                             <div className="loader"></div>
                         </div>
                     )}
-                    {activeTab === 'preview' ? (
-                        result && result.output && result.output[0] ? (
-                            <ImageComparisonSlider
-                                originalImage={formData.image}
-                                processedImage={result.output[0]}
-                                isFullscreen={isFullscreen}
-                            />
-                        ) : (
-                            <div className="text-center py-8">
-                                {formData.image ? "Upload an image and click 'Upscale Image' to see the result." : "No image uploaded yet."}
-                            </div>
-                        )
-                    ) : (
-                        <JsonView result={result} />
-                    )}
+                    {activeTab === 'preview' ? renderPreview() : <JsonView result={result} />}
                 </div>
                 {result && !isFullscreen && (
                     <>
@@ -121,6 +147,13 @@ export default function OutputDisplay({ result, formData, isLoading, onUpscale }
                             </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
+                            <button
+                                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                onClick={handleViewFullImage}
+                                disabled={!result || !result.output || !result.output[0]}
+                            >
+                                View Full Image
+                            </button>
                             <button
                                 className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
                                 onClick={handleDownload}

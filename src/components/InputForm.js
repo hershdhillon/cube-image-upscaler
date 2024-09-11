@@ -37,7 +37,9 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit(formData);
+        if (formData.image && !isLoading) {
+            onSubmit(formData);
+        }
     };
 
     const sdModelOptions = [
@@ -167,7 +169,7 @@ export default function InputForm({ formData, setFormData, onSubmit, isLoading }
                 <div className="pt-4">
                     <button
                         type="submit"
-                        disabled={isLoading}
+                        disabled={isLoading || !formData.image}
                         className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                     >
                         {isLoading ? 'Processing...' : 'Upscale Image'}

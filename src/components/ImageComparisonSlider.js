@@ -1,6 +1,5 @@
-'use client';
-
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 
 export default function ImageComparisonSlider({ originalImage, processedImage, isFullscreen }) {
     const [sliderPosition, setSliderPosition] = useState(50);
@@ -8,10 +7,17 @@ export default function ImageComparisonSlider({ originalImage, processedImage, i
     const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
     const containerRef = useRef(null);
 
+    // Default images from public folder
+    const defaultOriginalImage = "/images/default-original.png";
+    const defaultProcessedImage = "/images/default-processed.png";
+
+    const actualOriginalImage = originalImage || defaultOriginalImage;
+    const actualProcessedImage = processedImage || defaultProcessedImage;
+
     useEffect(() => {
         const loadImage = (src) => {
             return new Promise((resolve, reject) => {
-                const img = new Image();
+                const img = document.createElement('img');
                 img.onload = () => {
                     setImageDimensions({ width: img.width, height: img.height });
                     resolve(img);
@@ -21,10 +27,10 @@ export default function ImageComparisonSlider({ originalImage, processedImage, i
             });
         };
 
-        Promise.all([loadImage(originalImage), loadImage(processedImage)])
+        Promise.all([loadImage(actualOriginalImage), loadImage(actualProcessedImage)])
             .then(() => setIsLoaded(true))
             .catch((error) => console.error('Error loading images:', error));
-    }, [originalImage, processedImage]);
+    }, [actualOriginalImage, actualProcessedImage]);
 
     const handleMouseMove = (e) => {
         if (containerRef.current) {
@@ -51,13 +57,15 @@ export default function ImageComparisonSlider({ originalImage, processedImage, i
 
     const containerStyle = isFullscreen
         ? {
-            maxWidth: '90vw',
-            maxHeight: '90vh',
-            width: 'auto',
-            height: 'auto',
-            aspectRatio: `${imageDimensions.width} / ${imageDimensions.height}`,
+            width: '90vw',
+            height: '90vh',
         }
-        : { width: '100%', height: 'auto' };
+        : {
+            width: '100%',
+            height: '0',
+            paddingBottom: `${(imageDimensions.height / imageDimensions.width) * 100}%`,
+            maxHeight: '80vh',
+        };
 
     return (
         <div
@@ -67,12 +75,24 @@ export default function ImageComparisonSlider({ originalImage, processedImage, i
             onMouseMove={handleMouseMove}
             onTouchMove={handleTouchMove}
         >
-            <img src={originalImage} alt="Original" className="w-full h-full object-contain" />
+            <Image
+                src={actualOriginalImage}
+                alt="Original"
+                fill
+                style={{ objectFit: 'cover' }}
+                unoptimized={true}
+            />
             <div
                 className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden"
                 style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
             >
-                <img src={processedImage} alt="Processed" className="w-full h-full object-contain" />
+                <Image
+                    src={actualProcessedImage}
+                    alt="Processed"
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    unoptimized={true}
+                />
             </div>
             <div
                 className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg"
