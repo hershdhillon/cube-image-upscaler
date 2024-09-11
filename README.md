@@ -80,13 +80,6 @@ npm run dev
 
 This will start the Next.js development server with hot reloading.
 
-## Project Structure
-
-- `pages/`: Next.js pages
-- `components/`: React components
-- `public/`: Static assets
-- `styles/`: CSS styles
-- `api/`: API routes for backend communication
 
 ## Key Components
 
