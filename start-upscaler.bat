@@ -25,32 +25,24 @@ if %errorlevel% equ 0 (
     echo Docker is now running.
 )
 
+REM Always pull the latest image
+echo Pulling the latest Docker image...
+docker pull r8.im/philz1337x/clarity-upscaler:latest
+
 REM Check if the container already exists
 docker ps -a --filter "name=clarity-upscaler" --format "{{.Names}}" | findstr /i "clarity-upscaler" >nul
 if %errorlevel% equ 0 (
-    REM Container exists, check if it's running
-    docker ps --filter "name=clarity-upscaler" --format "{{.Names}}" | findstr /i "clarity-upscaler" >nul
-    if %errorlevel% equ 0 (
-        echo Clarity Upscaler container is already running.
-    ) else (
-        echo Clarity Upscaler container exists but is not running. Starting it...
-        docker start clarity-upscaler
-        if %errorlevel% neq 0 (
-            echo Failed to start existing container. Please check Docker logs for more information.
-            goto :end
-        )
-    )
-) else (
-    REM Container doesn't exist, pull image and create new container
-    echo Pulling the latest Docker image...
-    docker pull r8.im/philz1337x/clarity-upscaler
+    REM Container exists, remove it to ensure we use the latest image
+    echo Removing existing container to use the latest image...
+    docker rm -f clarity-upscaler
+)
 
-    echo Creating and running new Docker container...
-    docker run -d --name clarity-upscaler -p 5000:5000 --gpus=all r8.im/philz1337x/clarity-upscaler
-    if %errorlevel% neq 0 (
-        echo Failed to create and start the Docker container. Please check Docker logs for more information.
-        goto :end
-    )
+REM Create and run new container with the latest image
+echo Creating and running new Docker container...
+docker run -d --name clarity-upscaler -p 5000:5000 --gpus=all r8.im/philz1337x/clarity-upscaler:latest
+if %errorlevel% neq 0 (
+    echo Failed to create and start the Docker container. Please check Docker logs for more information.
+    goto :end
 )
 
 REM Change to the directory containing your Next.js app
