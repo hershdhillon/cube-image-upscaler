@@ -2,9 +2,13 @@
 setlocal enabledelayedexpansion
 
 REM Check if Docker Desktop is installed
-if not exist "%ProgramFiles%\Docker\Docker\Docker Desktop.exe" (
-    echo Docker Desktop is not installed. Please install Docker Desktop and try again.
-    goto :end
+set "DOCKER_PATH=%ProgramFiles%\Docker\Docker\Docker Desktop.exe"
+if not exist "%DOCKER_PATH%" (
+    set "DOCKER_PATH=C:\Program Files\Docker\Docker\Docker Desktop.exe"
+    if not exist "%DOCKER_PATH%" (
+        echo Docker Desktop is not installed or not found in the expected locations. Please install Docker Desktop and try again.
+        goto :end
+    )
 )
 
 REM Check if Docker is already running
@@ -13,7 +17,7 @@ if %errorlevel% equ 0 (
     echo Docker is already running.
 ) else (
     echo Starting Docker Desktop...
-    start "" "%ProgramFiles%\Docker\Docker\Docker Desktop.exe"
+    start "" "%DOCKER_PATH%"
 
     :wait_for_docker
     timeout /t 2 /nobreak >nul
