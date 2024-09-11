@@ -1,6 +1,13 @@
 @echo off
 setlocal enabledelayedexpansion
 
+REM Ensure Docker command is available
+where docker >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Docker command not found. Ensuring Docker Desktop is in PATH...
+    set "PATH=%PATH%;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin"
+)
+
 REM Check if Docker Desktop is installed
 set "DOCKER_PATH=%ProgramFiles%\Docker\Docker\Docker Desktop.exe"
 if not exist "%DOCKER_PATH%" (
@@ -43,11 +50,7 @@ if %errorlevel% equ 0 (
 )
 
 :docker_ready
-REM Rest of your script continues here...
-
-:end
-echo Script execution completed.
-pause
+echo Docker is fully operational.
 
 REM Check if the container already exists
 docker ps -a --filter "name=clarity-upscaler" --format "{{.Names}}" | findstr /i "clarity-upscaler" >nul
@@ -114,4 +117,5 @@ start http://localhost:3000
 echo Setup complete. The app should now be running and open in your browser.
 
 :end
+echo Script execution completed.
 pause
