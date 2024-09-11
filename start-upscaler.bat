@@ -43,10 +43,10 @@ if %errorlevel% equ 0 (
 ) else (
     REM Container doesn't exist, pull image and create new container
     echo Pulling the latest Docker image...
-    docker pull r8.im/philz1337x/clarity-upscaler
+    docker pull r8.im/philz1337x/clarity-upscaler:latest
 
     echo Creating and running new Docker container...
-    docker run -d --name clarity-upscaler -p 5000:5000 --gpus=all r8.im/philz1337x/clarity-upscaler
+    docker run -d --name clarity-upscaler -p 5000:5000 --gpus=all r8.im/philz1337x/clarity-upscaler:latest
     if %errorlevel% neq 0 (
         echo Failed to create and start the Docker container. Please check Docker logs for more information.
         goto :end

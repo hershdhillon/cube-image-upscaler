@@ -9,10 +9,10 @@ export default function Home() {
             <div className="relative z-10 p-4 sm:p-6 lg:p-8">
                 <div className="flex flex-col items-center mb-6">
                     <div className="flex justify-center items-center mb-2">
-                        <div className="relative w-8 h-8 mr-4">
+                        <div className="relative w-12 h-12 mr-4">
                             <Image
-                                src="/sidepro-logo.png"
-                                alt="SidePro Logo"
+                                src="/cube-icon.png"
+                                alt="Cube Logo"
                                 layout="fill"
                                 objectFit="contain"
                                 priority
