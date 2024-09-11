@@ -8,25 +8,42 @@ if %errorlevel% neq 0 (
     set "PATH=%PATH%;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin"
 )
 
+REM Check Docker version
+echo Checking Docker version...
+docker --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo Docker command is accessible.
+    for /f "tokens=3" %%i in ('docker --version') do set DOCKER_VERSION=%%i
+    echo Docker version: !DOCKER_VERSION!
+) else (
+    echo Failed to run Docker command. Please ensure Docker Desktop is installed and in PATH.
+    goto :end
+)
+
 REM Check if Docker Desktop is installed
 set "DOCKER_PATH=%ProgramFiles%\Docker\Docker\Docker Desktop.exe"
 if not exist "%DOCKER_PATH%" (
     set "DOCKER_PATH=C:\Program Files\Docker\Docker\Docker Desktop.exe"
     if not exist "%DOCKER_PATH%" (
-        echo Docker Desktop is not installed or not found in the expected locations. Please install Docker Desktop and try again.
-        goto :end
+        echo Docker Desktop executable not found in expected locations.
+        echo Continuing anyway as Docker command is accessible...
     )
 )
 
-REM Check if Docker is already running
+REM Check if Docker daemon is responsive
 :check_docker
+echo Checking if Docker daemon is responsive...
 docker info >nul 2>&1
 if %errorlevel% equ 0 (
-    echo Docker is already running.
+    echo Docker daemon is responsive and ready.
     goto :docker_ready
 ) else (
-    echo Docker is not running. Attempting to start Docker Desktop...
-    start "" "%DOCKER_PATH%"
+    echo Docker daemon is not responsive. Attempting to start Docker Desktop...
+    if exist "%DOCKER_PATH%" (
+        start "" "%DOCKER_PATH%"
+    ) else (
+        echo Docker Desktop executable not found. Please start Docker Desktop manually.
+    )
 )
 
 REM Wait for Docker to start
@@ -34,17 +51,17 @@ set /a attempts=0
 :wait_for_docker
 timeout /t 5 /nobreak >nul
 set /a attempts+=1
-echo Attempt %attempts%: Checking if Docker is running...
+echo Attempt %attempts%: Checking if Docker daemon is responsive...
 docker info >nul 2>&1
 if %errorlevel% equ 0 (
-    echo Docker is now running.
+    echo Docker daemon is now responsive and ready.
     goto :docker_ready
 ) else (
     if %attempts% lss 12 (
-        echo Docker is still starting. Waiting...
+        echo Docker daemon is still starting. Waiting...
         goto :wait_for_docker
     ) else (
-        echo Docker failed to start after 1 minute. Please check Docker Desktop manually.
+        echo Docker failed to become responsive after 1 minute. Please check Docker Desktop manually.
         goto :end
     )
 )
