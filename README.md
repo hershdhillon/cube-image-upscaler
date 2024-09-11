@@ -36,9 +36,9 @@ This project is a local image upscaling application built with Next.js and a Doc
 
 ### Using the Start Script
 
-1. Double-click the `start.bat` file or run it from the command line:
+1. Double-click the `start-upscaler.bat` file or run it from the command line:
    ```
-   start.bat
+   start-upscaler.bat
    ```
 
    This script will:
