@@ -4,63 +4,90 @@ setlocal enabledelayedexpansion
 REM Check if Docker Desktop is installed
 if not exist "%ProgramFiles%\Docker\Docker\Docker Desktop.exe" (
     echo Docker Desktop is not installed. Please install Docker Desktop and try again.
-    pause
-    exit /b 1
+    goto :end
 )
 
-REM Start Docker Desktop
-echo Starting Docker Desktop...
-start "" "%ProgramFiles%\Docker\Docker\Docker Desktop.exe"
+REM Check if Docker is already running
+docker info >nul 2>&1
+if %errorlevel% equ 0 (
+    echo Docker is already running.
+) else (
+    echo Starting Docker Desktop...
+    start "" "%ProgramFiles%\Docker\Docker\Docker Desktop.exe"
 
-REM Wait for Docker to start (adjust the timeout as needed)
-echo Waiting for Docker to start...
-timeout /t 30 /nobreak
-
-REM Check if Docker is running
-docker info > nul 2>&1
-if %errorlevel% neq 0 (
-    echo Docker is not running. Please start Docker Desktop manually and try again.
-    pause
-    exit /b 1
-)
-
-REM Check if the image exists, if not pull it
-docker image inspect r8.im/philz1337x/clarity-upscaler > nul 2>&1
-if %errorlevel% neq 0 (
-    echo Docker image not found. Pulling the image...
-    docker pull r8.im/philz1337x/clarity-upscaler
+    :wait_for_docker
+    timeout /t 2 /nobreak >nul
+    docker info >nul 2>&1
     if %errorlevel% neq 0 (
-        echo Failed to pull the Docker image. Please check your internet connection and try again.
-        pause
-        exit /b 1
+        echo Waiting for Docker to start...
+        goto :wait_for_docker
+    )
+    echo Docker is now running.
+)
+
+REM Check if the container already exists
+docker ps -a --filter "name=clarity-upscaler" --format "{{.Names}}" | findstr /i "clarity-upscaler" >nul
+if %errorlevel% equ 0 (
+    REM Container exists, check if it's running
+    docker ps --filter "name=clarity-upscaler" --format "{{.Names}}" | findstr /i "clarity-upscaler" >nul
+    if %errorlevel% equ 0 (
+        echo Clarity Upscaler container is already running.
+    ) else (
+        echo Clarity Upscaler container exists but is not running. Starting it...
+        docker start clarity-upscaler
+        if %errorlevel% neq 0 (
+            echo Failed to start existing container. Please check Docker logs for more information.
+            goto :end
+        )
+    )
+) else (
+    REM Container doesn't exist, pull image and create new container
+    echo Pulling the latest Docker image...
+    docker pull r8.im/philz1337x/clarity-upscaler
+
+    echo Creating and running new Docker container...
+    docker run -d --name clarity-upscaler -p 5000:5000 --gpus=all r8.im/philz1337x/clarity-upscaler
+    if %errorlevel% neq 0 (
+        echo Failed to create and start the Docker container. Please check Docker logs for more information.
+        goto :end
     )
 )
-
-REM Run the Docker image
-echo Running Docker image...
-docker run -d -p 5000:5000 --gpus=all r8.im/philz1337x/clarity-upscaler
 
 REM Change to the directory containing your Next.js app
 cd /d "%~dp0"
 
 REM Install dependencies (if needed)
 echo Installing dependencies...
-npm install
+call npm install
 
 REM Build the Next.js app
 echo Building the Next.js app...
-npm run build
+call npm run build
 
-REM Start the Next.js app
-echo Starting the Next.js app...
-start npm run start
+REM Check if the Next.js app is already running on port 3000
+netstat -ano | findstr :3000 >nul
+if %errorlevel% equ 0 (
+    echo Next.js app is already running on port 3000.
+) else (
+    REM Start the Next.js app
+    echo Starting the Next.js app...
+    start /B npm run start
 
-REM Wait for the app to start (adjust the timeout as needed)
-timeout /t 10 /nobreak
+    :wait_for_nextjs
+    timeout /t 2 /nobreak >nul
+    netstat -ano | findstr :3000 >nul
+    if %errorlevel% neq 0 (
+        echo Waiting for Next.js app to start...
+        goto :wait_for_nextjs
+    )
+    echo Next.js app is now running.
+)
 
 REM Open the default browser to the app's URL
 echo Opening the app in your default browser...
 start http://localhost:3000
 
 echo Setup complete. The app should now be running and open in your browser.
+
+:end
 pause
