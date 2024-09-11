@@ -11,8 +11,8 @@ export default function Home() {
                     <div className="flex justify-center items-center mb-2">
                         <div className="relative w-8 h-8 mr-4">
                             <Image
-                                src="/sidepro-logo.png"
-                                alt="SidePro Logo"
+                                src="/cube-icon.png"
+                                alt="Cube Logo"
                                 layout="fill"
                                 objectFit="contain"
                                 priority
