@@ -1,8 +1,8 @@
 export const metadata = {
-  title: 'Local Image Upscaler',
+  title: 'Cube Image Upscaler',
   description: 'Upscale your images locally',
     icons: {
-        icon: '/favicon.ico',
+        icon: '/cube-icon.ico',
     },
 }
 
