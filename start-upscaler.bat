@@ -1,77 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
 
-REM Ensure Docker command is available
-where docker >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Docker command not found. Ensuring Docker Desktop is in PATH...
-    set "PATH=%PATH%;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin"
-)
-
-REM Check Docker version
-echo Checking Docker installation...
-docker --version >nul 2>&1
-if %errorlevel% equ 0 (
-    for /f "tokens=3" %%i in ('docker --version') do set DOCKER_VERSION=%%i
-    echo Docker is installed. Version: !DOCKER_VERSION!
-    goto :docker_ready
-) else (
-    echo Docker command failed. Attempting to start Docker Desktop...
-    start "" "%ProgramFiles%\Docker\Docker\Docker Desktop.exe"
-)
-
-REM Wait for Docker to start
-set /a attempts=0
-:wait_for_docker
-timeout /t 5 /nobreak >nul
-set /a attempts+=1
-echo Attempt %attempts%: Checking Docker installation...
-docker --version >nul 2>&1
-if %errorlevel% equ 0 (
-    for /f "tokens=3" %%i in ('docker --version') do set DOCKER_VERSION=%%i
-    echo Docker is now running. Version: !DOCKER_VERSION!
-    goto :docker_ready
-) else (
-    if %attempts% lss 12 (
-        echo Docker is still starting. Waiting...
-        goto :wait_for_docker
-    ) else (
-        echo Docker failed to start after 1 minute. Please start Docker Desktop manually.
-        goto :end
-    )
-)
-
-:docker_ready
-echo Docker is operational.
-
-REM Check if the container already exists
-docker ps -a --filter "name=clarity-upscaler" --format "{{.Names}}" | findstr /i "clarity-upscaler" >nul
-if %errorlevel% equ 0 (
-    REM Container exists, check if it's running
-    docker ps --filter "name=clarity-upscaler" --format "{{.Names}}" | findstr /i "clarity-upscaler" >nul
-    if %errorlevel% equ 0 (
-        echo Clarity Upscaler container is already running.
-    ) else (
-        echo Clarity Upscaler container exists but is not running. Starting it...
-        docker start clarity-upscaler
-        if %errorlevel% neq 0 (
-            echo Failed to start existing container. Please check Docker logs for more information.
-            goto :end
-        )
-    )
-) else (
-    REM Container doesn't exist, pull image and create new container
-    echo Pulling the latest Docker image...
-    docker pull r8.im/philz1337x/clarity-upscaler:latest
-
-    echo Creating and running new Docker container...
-    docker run -d --name clarity-upscaler -p 5000:5000 --gpus=all r8.im/philz1337x/clarity-upscaler:latest
-    if %errorlevel% neq 0 (
-        echo Failed to create and start the Docker container. Please check Docker logs for more information.
-        goto :end
-    )
-)
-
 REM Change to the directory containing your Next.js app
 cd /d "%~dp0"
 
@@ -108,6 +37,5 @@ start http://localhost:3000
 
 echo Setup complete. The app should now be running and open in your browser.
 
-:end
 echo Script execution completed.
 pause

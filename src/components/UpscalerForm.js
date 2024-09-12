@@ -7,7 +7,7 @@ import OutputDisplay from './OutputDisplay';
 export default function UpscalerForm() {
     const [formData, setFormData] = useState({
         image: '',
-        prompt: "masterpiece, best quality, highres, <lora:more_details:0.5> <lora:SDXLrender_v2.0:1>",
+        prompt: "masterpiece, the best quality, highres, <lora:more_details:0.5> <lora:SDXLrender_v2.0:1>",
         dynamic: 6,
         sd_model: 'juggernaut_reborn.safetensors [338b85bc4f]',
         creativity: 0.35,
