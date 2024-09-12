@@ -1,3 +1,4 @@
+
 import ImageComparisonSlider from './ImageComparisonSlider';
 
 export default function ImagePreview({ result, formData, onFullscreen, isFullscreen }) {
