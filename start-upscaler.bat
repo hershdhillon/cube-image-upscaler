@@ -23,27 +23,63 @@ if defined pid (
     echo No process found running on port 3000.
 )
 
-REM Install dependencies if node_modules doesn't exist
-if not exist "node_modules" (
+REM Check if package.json has been modified since last npm install
+set npm_install=0
+if not exist "node_modules" set npm_install=1
+if exist "package.json" (
+    if exist "last_install.txt" (
+        for /f "tokens=1,2 delims=." %%a in ('dir /t:w package.json') do set pkg_date=%%a&set pkg_time=%%b
+        for /f "tokens=1,2 delims=." %%a in ('type last_install.txt') do set install_date=%%a&set install_time=%%b
+        if !pkg_date!!pkg_time! gtr !install_date!!install_time! set npm_install=1
+    ) else (
+        set npm_install=1
+    )
+)
+
+if !npm_install!==1 (
     echo Installing dependencies...
     call npm install
+    if !errorlevel! equ 0 (
+        echo %date%.%time% > last_install.txt
+        echo Dependencies installed successfully.
+    ) else (
+        echo Failed to install dependencies. Please check for errors.
+        exit /b 1
+    )
 ) else (
-    echo Dependencies already installed. Skipping npm install.
+    echo No changes to dependencies detected. Skipping npm install.
 )
 
 REM Check if build is necessary
 set rebuild=0
 if not exist ".next" set rebuild=1
-for /f %%i in ('dir /s /b /a:-d src 2^>nul ^| find /c /v ""') do set src_count=%%i
-if %src_count% gtr 0 (
-    for /f %%i in ('dir /s /b /a:-d src ^| sort /r /b ^| findstr /r "\.js$ \.jsx$ \.ts$ \.tsx$" ^| find /c /v ""') do set src_files=%%i
-    for /f %%i in ('dir /s /b /a:-d .next 2^>nul ^| find /c /v ""') do set build_files=%%i
-    if !src_files! gtr !build_files! set rebuild=1
+if not exist "last_build.txt" set rebuild=1
+if exist "last_build.txt" (
+    for /f %%i in ('dir /s /b /a:-d src ^| findstr /R "\.js$ \.jsx$ \.ts$ \.tsx$"') do (
+        for /f "tokens=1,2 delims=." %%a in ('dir /t:w %%i') do (
+            set file_date=%%a
+            set file_time=%%b
+        )
+        for /f "tokens=1,2 delims=." %%a in ('type last_build.txt') do (
+            set build_date=%%a
+            set build_time=%%b
+        )
+        if !file_date!!file_time! gtr !build_date!!build_time! set rebuild=1
+    )
 )
+
+if !npm_install!==1 set rebuild=1
 
 if %rebuild%==1 (
     echo Building the Next.js app...
     call npm run build
+    if !errorlevel! equ 0 (
+        echo %date%.%time% > last_build.txt
+        echo Build completed successfully.
+    ) else (
+        echo Build failed. Please check for errors.
+        exit /b 1
+    )
 ) else (
     echo No changes detected. Skipping build.
 )
