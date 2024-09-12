@@ -31,11 +31,11 @@ if %errorlevel% equ 0 (
     echo Next.js app is now running.
 )
 
-REM Open the default browser to the app's URL
-echo Opening the app in your default browser...
-start http://localhost:3000
+REM Open Chrome to the app's URL
+echo Opening the app in Chrome...
+start chrome http://localhost:3000
 
-echo Setup complete. The app should now be running and open in your browser.
+echo Setup complete. The app should now be running and open in Chrome.
 
 echo Script execution completed.
 pause
