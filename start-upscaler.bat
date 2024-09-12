@@ -23,13 +23,30 @@ if defined pid (
     echo No process found running on port 3000.
 )
 
-REM Install dependencies (if needed)
-echo Installing dependencies...
-call npm install
+REM Install dependencies if node_modules doesn't exist
+if not exist "node_modules" (
+    echo Installing dependencies...
+    call npm install
+) else (
+    echo Dependencies already installed. Skipping npm install.
+)
 
-REM Build the Next.js app
-echo Building the Next.js app...
-call npm run build
+REM Check if build is necessary
+set rebuild=0
+if not exist ".next" set rebuild=1
+for /f %%i in ('dir /s /b /a:-d src 2^>nul ^| find /c /v ""') do set src_count=%%i
+if %src_count% gtr 0 (
+    for /f %%i in ('dir /s /b /a:-d src ^| sort /r /b ^| findstr /r "\.js$ \.jsx$ \.ts$ \.tsx$" ^| find /c /v ""') do set src_files=%%i
+    for /f %%i in ('dir /s /b /a:-d .next 2^>nul ^| find /c /v ""') do set build_files=%%i
+    if !src_files! gtr !build_files! set rebuild=1
+)
+
+if %rebuild%==1 (
+    echo Building the Next.js app...
+    call npm run build
+) else (
+    echo No changes detected. Skipping build.
+)
 
 REM Start the Next.js app
 echo Starting the Next.js app...
