@@ -5,14 +5,22 @@ REM Change to the directory containing your Next.js app
 cd /d "%~dp0"
 
 REM Check if a process is already running on port 3000
+set pid=
 for /f "tokens=5" %%a in ('netstat -aon ^| find ":3000" ^| find "LISTENING"') do (
     set pid=%%a
 )
 
 if defined pid (
     echo Closing existing process on port 3000 (PID: !pid!)
-    taskkill /F /PID !pid!
+    taskkill /F /PID !pid! 2>nul
+    if !errorlevel! equ 0 (
+        echo Process successfully terminated.
+    ) else (
+        echo Failed to terminate process. It may have already closed.
+    )
     timeout /t 2 /nobreak >nul
+) else (
+    echo No process found running on port 3000.
 )
 
 REM Install dependencies (if needed)
