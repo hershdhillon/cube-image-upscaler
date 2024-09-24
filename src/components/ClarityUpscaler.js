@@ -33,7 +33,7 @@ export default function ClarityUpscaler() {
     const handleSubmit = async (newFormData) => {
         setIsLoading(true);
         try {
-            const response = await fetch('/api/upscale', {
+            const response = await fetch('/api/upscale-clarity', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ export default function ClarityUpscaler() {
     const pollPrediction = async (predictionId) => {
         const pollInterval = setInterval(async () => {
             try {
-                const response = await fetch(`/api/upscale?id=${predictionId}`);
+                const response = await fetch(`/api/upscale-clarity?id=${predictionId}`);
                 const prediction = await response.json();
                 if (response.status === 200) {
                     if (prediction.status === 'succeeded') {

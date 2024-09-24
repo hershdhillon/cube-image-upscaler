@@ -31,7 +31,7 @@ export default function UpscalerForm() {
     const handleSubmit = async (newFormData) => {
         setIsLoading(true);
         try {
-            const response = await fetch('/api/upscale', {
+            const response = await fetch('/api/upscale-clarity', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
