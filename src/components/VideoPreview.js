@@ -1,20 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-
 export default function VideoPreview({ result, isLoading }) {
-    const [isFullscreen, setIsFullscreen] = useState(false);
-
-    const toggleFullscreen = () => {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            }
-        }
-        setIsFullscreen(!isFullscreen);
-    };
 
     if (isLoading) {
         return (
@@ -42,12 +28,6 @@ export default function VideoPreview({ result, isLoading }) {
 
     return (
         <div className={`relative group ${isFullscreen ? 'fixed inset-0 z-50 bg-black' : ''}`}>
-            <button
-                onClick={toggleFullscreen}
-                className="absolute top-4 right-4 z-10 bg-white text-gray-800 px-3 py-1 rounded-md shadow-md text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-                {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
-            </button>
             <div className={`flex flex-col ${isFullscreen ? 'h-full' : ''}`}>
                 <div className={`flex ${isFullscreen ? 'flex-row h-full' : 'flex-col'}`}>
                     <div className={`${isFullscreen ? 'w-1/2 p-4' : 'mb-4'}`}>
