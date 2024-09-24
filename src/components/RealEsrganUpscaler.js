@@ -6,7 +6,7 @@ import VideoPreview from './VideoPreview';
 export default function RealEsrganUpscaler() {
     const [formData, setFormData] = useState({
         model: 'RealESRGAN_x4plus',
-        resolution: 'FHD',
+        resolution: '4K',
         video_path: ''
     });
     const [result, setResult] = useState(null);
@@ -93,7 +93,6 @@ export default function RealEsrganUpscaler() {
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                     >
                                         <option value="RealESRGAN_x4plus">RealESRGAN x4plus</option>
-                                        {/* Add more model options here if available */}
                                     </select>
                                 </div>
                                 <div className="mb-4">
