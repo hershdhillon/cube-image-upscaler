@@ -50,38 +50,15 @@ if !npm_install!==1 (
     echo No changes to dependencies detected. Skipping npm install.
 )
 
-REM Check if build is necessary
-set rebuild=0
-if not exist ".next" set rebuild=1
-if not exist "last_build.txt" set rebuild=1
-if exist "last_build.txt" (
-    for /f %%i in ('dir /s /b /a:-d src ^| findstr /R "\.js$ \.jsx$ \.ts$ \.tsx$"') do (
-        for /f "tokens=1,2 delims=." %%a in ('dir /t:w %%i') do (
-            set file_date=%%a
-            set file_time=%%b
-        )
-        for /f "tokens=1,2 delims=." %%a in ('type last_build.txt') do (
-            set build_date=%%a
-            set build_time=%%b
-        )
-        if !file_date!!file_time! gtr !build_date!!build_time! set rebuild=1
-    )
-)
-
-if !npm_install!==1 set rebuild=1
-
-if %rebuild%==1 (
-    echo Building the Next.js app...
-    call npm run build
-    if !errorlevel! equ 0 (
-        echo %date%.%time% > last_build.txt
-        echo Build completed successfully.
-    ) else (
-        echo Build failed. Please check for errors.
-        exit /b 1
-    )
+REM Always rebuild the app
+echo Building the Next.js app...
+call npm run build
+if !errorlevel! equ 0 (
+    echo %date%.%time% > last_build.txt
+    echo Build completed successfully.
 ) else (
-    echo No changes detected. Skipping build.
+    echo Build failed. Please check for errors.
+    exit /b 1
 )
 
 REM Start the Next.js app
