@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import VideoPreview from './VideoPreview';
 
 export default function RealEsrganUpscaler() {
@@ -12,22 +12,7 @@ export default function RealEsrganUpscaler() {
     const [result, setResult] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [fileName, setFileName] = useState('');
-    const [originalVideoUrl, setOriginalVideoUrl] = useState(null);
     const fileInputRef = useRef(null);
-
-    const handleNewVideoUpload = useCallback(() => {
-        setResult(null);
-    }, []);
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setFormData({ ...formData, video: file });
-            setFileName(file.name);
-            setOriginalVideoUrl(URL.createObjectURL(file));
-            handleNewVideoUpload();
-        }
-    };
 
     useEffect(() => {
         // Set initial result to show example videos
@@ -57,7 +42,6 @@ export default function RealEsrganUpscaler() {
             });
             const data = await response.json();
             if (response.ok) {
-                setOriginalVideoUrl(data.originalVideo);
                 if (data.id) {
                     await pollPrediction(data.id);
                 } else {
@@ -80,6 +64,7 @@ export default function RealEsrganUpscaler() {
                 const response = await fetch(`/api/upscale-video-esrgan?id=${predictionId}`);
                 const prediction = await response.json();
                 if (response.status === 200) {
+                    setLogs(prediction.logs || '');
                     if (prediction.status === 'succeeded') {
                         clearInterval(pollInterval);
                         setResult(prevResult => ({
@@ -108,6 +93,13 @@ export default function RealEsrganUpscaler() {
         }, 1000); // Poll every second
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFormData({ ...formData, video: file });
+            setFileName(file.name);
+        }
+    };
 
     const triggerFileInput = () => {
         fileInputRef.current.click();
@@ -179,12 +171,7 @@ export default function RealEsrganUpscaler() {
                         </div>
                         <div className="lg:w-2/3 p-6 lg:p-8">
                             <h2 className="text-2xl font-bold mb-4">Output</h2>
-                            <VideoPreview
-                                result={result}
-                                isLoading={isLoading}
-                                originalVideo={originalVideoUrl}
-                                onNewVideoUpload={handleNewVideoUpload}
-                            />
+                            <VideoPreview result={result} isLoading={isLoading} />
                         </div>
                     </div>
                 </div>
