@@ -1,16 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import VideoPreview from './VideoPreview';
 
 export default function RealEsrganUpscaler() {
     const [formData, setFormData] = useState({
         model: 'RealESRGAN_x4plus',
         resolution: '4K',
-        video_path: ''
+        video: null
     });
     const [result, setResult] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [fileName, setFileName] = useState('');
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         // Set initial result to show example videos
@@ -22,14 +24,21 @@ export default function RealEsrganUpscaler() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!formData.video) {
+            alert('Please select a video file');
+            return;
+        }
         setIsLoading(true);
+
+        const formDataToSend = new FormData();
+        formDataToSend.append('model', formData.model);
+        formDataToSend.append('resolution', formData.resolution);
+        formDataToSend.append('video', formData.video);
+
         try {
-            const response = await fetch('/api/upscale-video', {
+            const response = await fetch('/api/upscale-video-esrgan', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
+                body: formDataToSend,
             });
             const data = await response.json();
             if (response.ok) {
@@ -76,6 +85,18 @@ export default function RealEsrganUpscaler() {
         }, 1000); // Poll every second
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFormData({ ...formData, video: file });
+            setFileName(file.name);
+        }
+    };
+
+    const triggerFileInput = () => {
+        fileInputRef.current.click();
+    };
+
     return (
         <div className="min-h-screen sm:p-2 lg:p-4">
             <div className="max-w-full mx-auto">
@@ -108,19 +129,31 @@ export default function RealEsrganUpscaler() {
                                     </select>
                                 </div>
                                 <div className="mb-4">
-                                    <label htmlFor="video_path" className="block text-sm font-medium text-gray-700">Video URL</label>
+                                    <label htmlFor="video" className="block text-sm font-medium text-gray-700">Upload Video</label>
                                     <input
-                                        type="text"
-                                        id="video_path"
-                                        value={formData.video_path}
-                                        onChange={(e) => setFormData({...formData, video_path: e.target.value})}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                        placeholder="Enter video URL"
+                                        type="file"
+                                        id="video"
+                                        ref={fileInputRef}
+                                        onChange={handleFileChange}
+                                        accept="video/*"
+                                        className="hidden"
                                     />
+                                    <div className="mt-1 flex items-center">
+                                        <button
+                                            type="button"
+                                            onClick={triggerFileInput}
+                                            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        >
+                                            Choose File
+                                        </button>
+                                        <span className="ml-3 text-sm text-gray-500">
+                                            {fileName || 'No file chosen'}
+                                        </span>
+                                    </div>
                                 </div>
                                 <button
                                     type="submit"
-                                    disabled={isLoading || !formData.video_path}
+                                    disabled={isLoading || !formData.video}
                                     className="w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                                 >
                                     {isLoading ? 'Processing...' : 'Upscale Video'}
