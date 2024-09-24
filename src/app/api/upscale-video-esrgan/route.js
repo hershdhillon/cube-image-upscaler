@@ -5,7 +5,6 @@ import path from 'path';
 import crypto from 'crypto';
 import os from 'os';
 
-const API_TIMEOUT = 120000;
 const API_URL = 'http://localhost:5005';
 
 // Function to get the host IP
@@ -66,8 +65,6 @@ export async function POST(request) {
                 resolution: resolution || "4K",
                 video_path: publicUrl
             }
-        }, {
-            timeout: API_TIMEOUT,
         });
 
         console.log('Response received from Real-ESRGAN API:', response.data);
