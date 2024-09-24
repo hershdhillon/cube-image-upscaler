@@ -61,7 +61,7 @@ export default function UpscalerForm() {
     const pollPrediction = async (predictionId) => {
         const pollInterval = setInterval(async () => {
             try {
-                const response = await fetch(`/api/upscale?id=${predictionId}`);
+                const response = await fetch(`/api/upscale-clarity?id=${predictionId}`);
                 const prediction = await response.json();
                 if (response.status === 200) {
                     if (prediction.status === 'succeeded') {
