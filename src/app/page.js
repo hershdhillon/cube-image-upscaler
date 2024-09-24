@@ -50,7 +50,7 @@ export default function Home() {
                                 priority
                             />
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-800">Image Upscaler</h1>
+                        <h1 className="text-3xl font-bold text-gray-800">Cube Upscaler</h1>
                     </div>
                     <p className="text-sm text-gray-600 text-center">
                         {selectedModelData.tagline}
