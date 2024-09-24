@@ -102,9 +102,7 @@ export async function GET(request) {
     }
 
     try {
-        const response = await axios.get(`${API_URL}/predictions/${id}`, {
-            timeout: API_TIMEOUT,
-        });
+        const response = await axios.get(`${API_URL}/predictions/${id}`);
         return NextResponse.json(response.data);
     } catch (error) {
         console.error('Error fetching prediction:', error);
