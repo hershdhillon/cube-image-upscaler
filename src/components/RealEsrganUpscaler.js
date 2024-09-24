@@ -61,12 +61,17 @@ export default function RealEsrganUpscaler() {
     const pollPrediction = async (predictionId) => {
         const pollInterval = setInterval(async () => {
             try {
-                const response = await fetch(`/api/upscale-video?id=${predictionId}`);
+                const response = await fetch(`/api/upscale-video-esrgan?id=${predictionId}`);
                 const prediction = await response.json();
                 if (response.status === 200) {
+                    setLogs(prediction.logs || '');
                     if (prediction.status === 'succeeded') {
                         clearInterval(pollInterval);
-                        setResult(prediction);
+                        setResult(prevResult => ({
+                            ...prevResult,
+                            output: prediction.output,
+                            status: 'succeeded'
+                        }));
                         setIsLoading(false);
                     } else if (prediction.status === 'failed') {
                         clearInterval(pollInterval);
@@ -79,7 +84,10 @@ export default function RealEsrganUpscaler() {
             } catch (error) {
                 clearInterval(pollInterval);
                 console.error('Polling error:', error);
-                setResult({error: error.message || 'An error occurred while fetching the upscaling result'});
+                setResult(prevResult => ({
+                    ...prevResult,
+                    error: error.message || 'An error occurred while fetching the upscaling result'
+                }));
                 setIsLoading(false);
             }
         }, 1000); // Poll every second

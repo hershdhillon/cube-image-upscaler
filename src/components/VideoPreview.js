@@ -53,7 +53,7 @@ export default function VideoPreview({ result, isLoading }) {
                     <div className={`${isFullscreen ? 'w-1/2 p-4' : 'mb-4'}`}>
                         <h3 className="text-lg font-semibold mb-2">Original Video</h3>
                         <video
-                            src={result.input}
+                            src={result.originalVideo || result.input}
                             controls
                             className="w-full h-auto"
                         >

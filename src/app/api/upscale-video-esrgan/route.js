@@ -67,6 +67,8 @@ export async function POST(request) {
             }
         });
 
+        response.data.originalVideo = publicUrl;
+
         console.log('Response received from Real-ESRGAN API:', response.data);
 
         return NextResponse.json(response.data, { status: 200 });
