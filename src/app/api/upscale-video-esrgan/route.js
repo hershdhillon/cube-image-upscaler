@@ -7,8 +7,7 @@ import os from 'os';
 
 const API_URL = 'http://localhost:5005';
 
-// Function to get the host IP
-function getHostIP() {
+function getLocalIP() {
     const interfaces = os.networkInterfaces();
     for (const devName in interfaces) {
         const iface = interfaces[devName];
@@ -22,8 +21,7 @@ function getHostIP() {
     return '127.0.0.1';
 }
 
-// Use the host IP instead of localhost
-const BASE_URL = `http://${getHostIP()}:3000`;
+const BASE_URL = `http://${getLocalIP()}:3000`;
 
 export async function POST(request) {
     try {
@@ -52,7 +50,7 @@ export async function POST(request) {
 
         console.log('File saved at:', filePath);
 
-        // Generate the public URL for the video using the host IP
+        // Generate the public URL for the video using the local IP
         const publicUrl = `${BASE_URL}/uploads/${uniqueFilename}`;
         console.log('Public URL:', publicUrl);
 

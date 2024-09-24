@@ -63,7 +63,7 @@ if !errorlevel! equ 0 (
 
 REM Start the Next.js app
 echo Starting the Next.js app...
-start /B npm run start
+start /B npm run start:local
 
 REM Wait for the app to start
 :wait_for_nextjs
