@@ -104,20 +104,20 @@ export async function POST(request) {
         // Use the output URL provided by the API
         const outputUrl = response.data.output;
 
-        // Ensure the video_upscaled_output directory exists
-        const outputDir = path.join(process.cwd(), 'public', 'video_upscaled_output');
-        await ensureDirectoryExists(outputDir);
+        // Ensure the results directory exists
+        const resultsDir = path.join(process.cwd(), 'results');
+        await ensureDirectoryExists(resultsDir);
 
         // Generate the upscaled filename
         const originalBaseName = path.basename(uniqueFilename, path.extname(uniqueFilename));
         const upscaledFilename = `${originalBaseName}_upscaled${path.extname(uniqueFilename)}`;
-        const upscaledFilePath = path.join(outputDir, upscaledFilename);
+        const upscaledFilePath = path.join(resultsDir, upscaledFilename);
 
         // Download the upscaled video
         await downloadFile(outputUrl, upscaledFilePath);
 
         response.data.originalVideo = publicUrl;
-        response.data.upscaledVideo = `${BASE_URL}/video_upscaled_output/${upscaledFilename}`;
+        response.data.upscaledVideoPath = upscaledFilePath;
 
         console.log('Response received from Real-ESRGAN API:', response.data);
 
