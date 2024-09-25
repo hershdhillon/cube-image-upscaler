@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir, access } from 'fs/promises';
+import { writeFile, mkdir, access, readdir, unlink, stat } from 'fs/promises';
 import path from 'path';
 import os from 'os';
 
 const API_URL = 'http://localhost:5005';
+const MAX_FILE_AGE = 2 * 60 * 60 * 1000;
 
 function getLocalIP() {
     const interfaces = os.networkInterfaces();
@@ -55,6 +56,22 @@ async function downloadFile(fileUrl, outputPath) {
     await writeFile(outputPath, buffer);
 }
 
+async function cleanupOldFiles(dir) {
+    const now = Date.now();
+    const files = await readdir(dir);
+
+    for (const file of files) {
+        const filePath = path.join(dir, file);
+        const stats = await stat(filePath);
+        const fileAge = now - stats.mtime.getTime();
+
+        if (fileAge > MAX_FILE_AGE) {
+            await unlink(filePath);
+            console.log(`Deleted old file: ${filePath}`);
+        }
+    }
+}
+
 export async function POST(request) {
     try {
         const formData = await request.formData();
@@ -66,14 +83,15 @@ export async function POST(request) {
             return NextResponse.json({ error: 'No video file uploaded' }, { status: 400 });
         }
 
-        // Ensure the public/uploads directory exists
+        // Option 1: Clean up old files in the uploads directory
         const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
         await ensureDirectoryExists(uploadsDir);
+        await cleanupOldFiles(uploadsDir);
 
         // Get a unique filename that preserves the original name
         const uniqueFilename = await getUniqueFilename(uploadsDir, video.name);
 
-        // Save the video file in the public/uploads directory
+        // Save the video file in the uploads directory
         const bytes = await video.arrayBuffer();
         const buffer = Buffer.from(bytes);
         const filePath = path.join(uploadsDir, uniqueFilename);
@@ -120,6 +138,9 @@ export async function POST(request) {
         response.data.upscaledVideoPath = upscaledFilePath;
 
         console.log('Response received from Real-ESRGAN API:', response.data);
+
+        // Option 2: Clean up the temporary file
+        // await unlink(filePath);
 
         return NextResponse.json(response.data, { status: 200 });
     } catch (error) {
