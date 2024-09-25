@@ -72,6 +72,11 @@ async function cleanupOldFiles(dir) {
     }
 }
 
+function getCurrentDate() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
 export async function POST(request) {
     try {
         const formData = await request.formData();
@@ -83,7 +88,7 @@ export async function POST(request) {
             return NextResponse.json({ error: 'No video file uploaded' }, { status: 400 });
         }
 
-        // Option 1: Clean up old files in the uploads directory
+        // Clean up old files in the uploads directory
         const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
         await ensureDirectoryExists(uploadsDir);
         await cleanupOldFiles(uploadsDir);
@@ -122,8 +127,9 @@ export async function POST(request) {
         // Use the output URL provided by the API
         const outputUrl = response.data.output;
 
-        // Ensure the results directory exists
-        const resultsDir = path.join(process.cwd(), 'results');
+        // Create the date-based directory structure
+        const currentDate = getCurrentDate();
+        const resultsDir = path.join(process.cwd(), 'results', 'upscaled_video', currentDate);
         await ensureDirectoryExists(resultsDir);
 
         // Generate the upscaled filename
@@ -138,9 +144,6 @@ export async function POST(request) {
         response.data.upscaledVideoPath = upscaledFilePath;
 
         console.log('Response received from Real-ESRGAN API:', response.data);
-
-        // Option 2: Clean up the temporary file
-        // await unlink(filePath);
 
         return NextResponse.json(response.data, { status: 200 });
     } catch (error) {
